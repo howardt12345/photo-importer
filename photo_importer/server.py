@@ -12,9 +12,9 @@ import subprocess
 import http.server
 from http import HTTPStatus
 
-from . import log
-from . import config
-from . import importer
+from photo_importer import log
+from photo_importer import config
+from photo_importer import importer
 
 
 FIXED_IN_PATH_NAME = 'none'

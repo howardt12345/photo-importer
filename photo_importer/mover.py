@@ -5,7 +5,7 @@ import shutil
 import logging
 import subprocess
 
-from . import fileprop
+from photo_importer import fileprop
 
 
 class Mover(object):
