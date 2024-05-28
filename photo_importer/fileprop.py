@@ -19,28 +19,28 @@ GARBAGE = 4
 class FileProp(object):
     DATE_REGEX = [
         (
-            re.compile('\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}'),
+            re.compile(r'\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}'),
             '%Y-%m-%d_%H-%M-%S',
         ),
         (
-            re.compile('\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}'),
+            re.compile(r'\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}'),
             '%Y-%m-%d-%H-%M-%S',
         ),
         (
-            re.compile('\d{4}-\d{2}-\d{2}T\d{2}.\d{2}.\d{2}'),
+            re.compile(r'\d{4}-\d{2}-\d{2}T\d{2}.\d{2}.\d{2}'),
             '%Y-%m-%dT%H.%M.%S',
         ),
         (
-            re.compile('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}'),
+            re.compile(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}'),
             '%Y-%m-%dT%H:%M:%S',
         ),
         (
-            re.compile('\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}'),
+            re.compile(r'\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}'),
             '%Y_%m_%d_%H_%M_%S',
         ),
-        (re.compile('\d{8}_\d{6}'), '%Y%m%d_%H%M%S'),
-        (re.compile('\d{14}'), '%Y%m%d%H%M%S'),
-        (re.compile('\d{8}'), '%Y%m%d'),
+        (re.compile(r'\d{8}_\d{6}'), '%Y%m%d_%H%M%S'),
+        (re.compile(r'\d{14}'), '%Y%m%d%H%M%S'),
+        (re.compile(r'\d{8}'), '%Y%m%d'),
     ]
 
     SPACE_REGEX = re.compile(r'\s+')
@@ -90,7 +90,7 @@ class FileProp(object):
 
     def __type_by_ext(self, ext):
         try:
-            return self.EXT_TO_TYPE[ext.lower()]
+            return self.EXT_TO_TYPE[ext]
         except KeyError:
             logging.warning('Unknown ext: ' + ext)
             return IGNORE
@@ -182,10 +182,14 @@ class FileProp(object):
     def get(self, fullname):
         path, fname_ext = os.path.split(fullname)
         fname, ext = os.path.splitext(fname_ext)
+        ext = ext.lower()
 
         tp = self.__type_by_ext(ext)
 
         ftime = self.__time(fullname, fname, tp)
+        time_shift = self.__config['main']['time_shift']
+        if ftime and time_shift:
+            ftime += datetime.timedelta(seconds=int(time_shift))
 
         if ftime:
             out_name = ftime.strftime(
